@@ -6721,13 +6721,33 @@ static char *handle_check_index_coverage(cbm_mcp_server_t *srv, const char *args
     return result;
 }
 
+/* BT-240: fail-closed freshness verdict. A live checkout SHA is not proof of
+ * the generation that produced graph content, so the verdict must come from
+ * the indexed-checkout identity recorded with the DB. Legacy DBs record no
+ * such identity: expose the graph generation separately and fail closed as
+ * unknown rather than pretending the live checkout produced the graph. This
+ * is a report-only signal — it never triggers indexing. */
+static void add_index_freshness_json(yyjson_mut_doc *doc, yyjson_mut_val *root,
+                                     const char *indexed_generation) {
+    yyjson_mut_val *freshness = yyjson_mut_obj(doc);
+    if (indexed_generation && indexed_generation[0]) {
+        yyjson_mut_obj_add_strcpy(doc, freshness, "indexed_generation", indexed_generation);
+    } else {
+        yyjson_mut_obj_add_str(doc, freshness, "indexed_generation", "");
+    }
+    yyjson_mut_obj_add_null(doc, freshness, "indexed_checkout_sha");
+    yyjson_mut_obj_add_str(doc, freshness, "verdict", "unknown");
+    yyjson_mut_obj_add_str(doc, freshness, "reason", "indexed_checkout_unavailable");
+    yyjson_mut_obj_add_val(doc, root, "freshness", freshness);
+}
+
 static char *handle_index_status(cbm_mcp_server_t *srv, const char *args) {
     char *project = get_project_arg(args);
     cbm_store_t *store = resolve_store(srv, project);
     REQUIRE_STORE(store, project);
-    /* The git context block (worktree/shadow path variants) only matters when
-     * debugging index-location issues — gate it so the common status call
-     * stays lean. */
+    /* The git context block (worktree/shadow path variants) and the freshness
+     * verdict only matter when debugging index-location issues — gate them so
+     * the common status call stays lean. */
     bool verbose = cbm_mcp_get_bool_arg(args, "verbose");
     char *diagnostics = cbm_mcp_get_string_arg(args, "diagnostics");
     int coverage_samples = 0;
@@ -6758,6 +6778,7 @@ static char *handle_index_status(cbm_mcp_server_t *srv, const char *args) {
                                       proj_info.indexed_at ? proj_info.indexed_at : "");
             if (verbose) {
                 add_git_context_json(doc, root, proj_info.root_path);
+                add_index_freshness_json(doc, root, proj_info.indexed_at);
             }
         }
         add_coverage_report(doc, root, store, project, have_proj_info ? proj_info.indexed_at : NULL,
