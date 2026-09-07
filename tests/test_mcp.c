@@ -5907,7 +5907,8 @@ TEST(tool_index_status_fails_closed_without_indexed_checkout_identity) {
     ASSERT_NOT_NULL(srv);
 
     char *resp = cbm_mcp_handle_tool(
-        srv, "index_status", "{\"project\":\"test-project\",\"verbose\":true}");
+        srv, "index_status",
+        "{\"project\":\"test-project\",\"verbose\":true,\"format\":\"json\"}");
     ASSERT_NOT_NULL(resp);
     char *inner = extract_text_content(resp);
     ASSERT_NOT_NULL(inner);
@@ -5932,7 +5933,8 @@ TEST(tool_index_status_omits_freshness_by_default) {
     cbm_mcp_server_t *srv = setup_snippet_server(tmp, sizeof(tmp));
     ASSERT_NOT_NULL(srv);
 
-    char *resp = cbm_mcp_handle_tool(srv, "index_status", "{\"project\":\"test-project\"}");
+    char *resp = cbm_mcp_handle_tool(
+        srv, "index_status", "{\"project\":\"test-project\",\"format\":\"json\"}");
     ASSERT_NOT_NULL(resp);
     char *inner = extract_text_content(resp);
     ASSERT_NOT_NULL(inner);
@@ -6039,7 +6041,8 @@ TEST(tool_index_status_freshness_verdict_current_when_indexed_checkout_matches) 
     }
 
     char *resp = cbm_mcp_handle_tool(
-        srv, "index_status", "{\"project\":\"fresh-project\",\"verbose\":true}");
+        srv, "index_status",
+        "{\"project\":\"fresh-project\",\"verbose\":true,\"format\":\"json\"}");
     ASSERT_NOT_NULL(resp);
     char *inner = extract_text_content(resp);
     ASSERT_NOT_NULL(inner);
@@ -6077,7 +6080,8 @@ TEST(tool_index_status_freshness_verdict_stale_when_indexed_checkout_mismatches)
     }
 
     char *resp = cbm_mcp_handle_tool(
-        srv, "index_status", "{\"project\":\"fresh-project\",\"verbose\":true}");
+        srv, "index_status",
+        "{\"project\":\"fresh-project\",\"verbose\":true,\"format\":\"json\"}");
     ASSERT_NOT_NULL(resp);
     char *inner = extract_text_content(resp);
     ASSERT_NOT_NULL(inner);
@@ -6133,7 +6137,8 @@ TEST(tool_index_status_freshness_verdict_stale_when_tracked_changes) {
     }
 
     char *resp = cbm_mcp_handle_tool(
-        srv, "index_status", "{\"project\":\"fresh-project\",\"verbose\":true}");
+        srv, "index_status",
+        "{\"project\":\"fresh-project\",\"verbose\":true,\"format\":\"json\"}");
     ASSERT_NOT_NULL(resp);
     char *inner = extract_text_content(resp);
     ASSERT_NOT_NULL(inner);
@@ -6184,7 +6189,8 @@ TEST(tool_index_status_freshness_verdict_unknown_when_untracked_only) {
     }
 
     char *resp = cbm_mcp_handle_tool(
-        srv, "index_status", "{\"project\":\"fresh-project\",\"verbose\":true}");
+        srv, "index_status",
+        "{\"project\":\"fresh-project\",\"verbose\":true,\"format\":\"json\"}");
     ASSERT_NOT_NULL(resp);
     char *inner = extract_text_content(resp);
     ASSERT_NOT_NULL(inner);
@@ -6242,7 +6248,8 @@ TEST(tool_index_status_freshness_verdict_stale_when_tracked_and_untracked) {
     }
 
     char *resp = cbm_mcp_handle_tool(
-        srv, "index_status", "{\"project\":\"fresh-project\",\"verbose\":true}");
+        srv, "index_status",
+        "{\"project\":\"fresh-project\",\"verbose\":true,\"format\":\"json\"}");
     ASSERT_NOT_NULL(resp);
     char *inner = extract_text_content(resp);
     ASSERT_NOT_NULL(inner);
@@ -6272,7 +6279,8 @@ TEST(tool_index_status_freshness_status_unavailable_non_git) {
     }
 
     char *resp = cbm_mcp_handle_tool(
-        srv, "index_status", "{\"project\":\"fresh-project\",\"verbose\":true}");
+        srv, "index_status",
+        "{\"project\":\"fresh-project\",\"verbose\":true,\"format\":\"json\"}");
     ASSERT_NOT_NULL(resp);
     char *inner = extract_text_content(resp);
     ASSERT_NOT_NULL(inner);
@@ -6327,7 +6335,8 @@ TEST(tool_index_status_freshness_sample_cap_truncates) {
     }
 
     char *resp = cbm_mcp_handle_tool(
-        srv, "index_status", "{\"project\":\"fresh-project\",\"verbose\":true}");
+        srv, "index_status",
+        "{\"project\":\"fresh-project\",\"verbose\":true,\"format\":\"json\"}");
     ASSERT_NOT_NULL(resp);
     char *inner = extract_text_content(resp);
     ASSERT_NOT_NULL(inner);
