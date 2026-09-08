@@ -204,9 +204,12 @@ shard_filter() {
 # widened; see the calibration note in tests/test_extraction.c, which records
 # that 40 sits >=2x from both the linear and quadratic signals, so inflating it
 # would move the test toward the very thing it exists to catch. Quiet is the
-# fix, and at ~22s the suite is cheap to run alone.
+# fix, and at ~22s the suite is cheap to run alone. The complexity suite has
+# the same scheduler-sensitive replicated-corpus ratio guard: concurrent
+# allocator/CPU pressure can inflate its node ratio past the 2.75 bound.
+# Keep it in the quiet tail so the result measures scaling, not contention.
 SERIAL_SUITES="cli subprocess watcher incremental httpd ui index_resilience mcp \
-    extraction \
+    extraction complexity \
     stack_overflow_a stack_overflow_b stack_overflow_c \
     index_supervisor daemon_application daemon_runtime daemon_frontend \
     daemon_bootstrap daemon_ipc"
